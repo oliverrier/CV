@@ -15,7 +15,7 @@
     </div>
 </nav>
 
-
+<div class="container">
     <div class="center valign-center">
         <img class="circle" src="images/PhotoCV.jpg">
     </div>
@@ -26,7 +26,7 @@
                 <h1 class="card-title center">Olivier VERRIER </h1>
                 <p class="col s12 m4 offset-m4 center">
                     Bonjour à tous et bienvenue sur mon site.
-                    Actuellement étudiant en informatique, je suis passioné de développement logiciel, de jeux vidéos et de mangas.
+                    Actuellement étudiant en informatique, je suis passionné de développement logiciel, de jeux vidéos et de mangas.
                     Je vous souhaite une agréable visite.
                 </p>
             </div>

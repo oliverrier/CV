@@ -1,1 +1,5 @@
 <?php
+
+    $pdo = connectPdo();
+
+

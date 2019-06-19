@@ -1,3 +1,14 @@
+<?php
+
+include 'funcs/dataBase.php';
+include 'funcs/tools.php';
+
+useSession();
+
+$pdo = connectPdo();
+
+?>
+
 <?php include_once"incs/head.php" ?>
 <?php include_once"incs/header.php" ?>
 
@@ -21,76 +32,30 @@
 
     <div class="container">
         <div class="row s12">
+            <?php
+            $projects = getAllProject($pdo);
+            foreach ($projects as $project)
+            {
+                ?>
             <div class="col s3">
-            <div class="card sticky-action small s3">
-                <div class="card-image waves-effect waves-block waves-light">
-                    <img class="activator" src="images/testdummy.jpeg">
-                </div>
-                <div class="card-content">
-                    <span class="card-title activator grey-text text-darken-4">ProjectTitle<i class="material-icons right">more_vert</i></span>
-                    <p><a href="#">ProjectLink</a></p>
-                </div>
-                <div class="card-reveal">
-                    <span class="card-title grey-text text-darken-4">ProjectTitle<i class="material-icons right">close</i></span>
-                    <p>ProjectDescription</p>
-                </div>
-            </div>
-        </div>
-            <div class="col s3">
+                <div class="card sticky-action small s3">
+                    <div class="card-image waves-effect waves-block waves-light">
+                        <img class="activator" src="images/testdummy.jpeg">
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title activator grey-text text-darken-4"><?php echo $project['name']?><i class="material-icons right">more_vert</i></span>
+                    </div>
+                    <div class="card-reveal">
+                        <span class="card-title grey-text text-darken-4"><?php echo $project['name']?><i class="material-icons right">close</i></span>
+                        <p><?php echo $project['description']?></p>
+                    </div>
 
-            <div class="card sticky-action small s3">
-                <div class="card-image waves-effect waves-block waves-light">
-                    <img class="activator" src="images/testdummy.jpeg">
-                </div>
-                <div class="card-content">
-                    <span class="card-title activator grey-text text-darken-4">ProjectTitle<i class="material-icons right">more_vert</i></span>
-                    <p><a href="#">ProjectLink</a></p>
-                </div>
-                <div class="card-reveal">
-                    <span class="card-title grey-text text-darken-4">ProjectTitle<i class="material-icons right">close</i></span>
-                    <p>ProjectDescription</p>
                 </div>
             </div>
-            </div>
+            <?php } ?>
         </div>
 
-            <div class="row s12">
-                <div class="col s3">
 
-            <div class="card sticky-action small s3">
-                <div class="card-image waves-effect waves-block waves-light">
-                    <img class="activator" src="images/testdummy.jpeg">
-                </div>
-                <div class="card-content">
-                    <span class="card-title activator grey-text text-darken-4">ProjectTitle<i class="material-icons right">more_vert</i></span>
-                    <p><a href="#">ProjectLink</a></p>
-                </div>
-                <div class="card-reveal">
-                    <span class="card-title grey-text text-darken-4">ProjectTitle<i class="material-icons right">close</i></span>
-                    <p>ProjectDescription</p>
-                </div>
-            </div>
-                </div>
-
-                    <div class="col s3">
-
-            <div class="card sticky-action small s3">
-                <div class="card-image waves-effect waves-block waves-light">
-                    <img class="activator" src="images/testdummy.jpeg">
-                </div>
-                <div class="card-content">
-                    <span class="card-title activator grey-text text-darken-4">ProjectTitle<i class="material-icons right">more_vert</i></span>
-                    <p><a href="#">ProjectLink</a></p>
-                </div>
-                <div class="card-reveal">
-                    <span class="card-title grey-text text-darken-4">ProjectTitle<i class="material-icons right">close</i></span>
-                    <p>ProjectDescription</p>
-                </div>
-            </div>
-                        </div>
-
-
-        </div>
     </div>
 
 

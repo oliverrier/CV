@@ -1,3 +1,14 @@
+<?php
+
+include 'funcs/dataBase.php';
+include 'funcs/tools.php';
+
+useSession();
+
+$pdo = connectPdo();
+
+?>
+
 <?php include_once"incs/head.php" ?>
 <?php include_once"incs/header.php" ?>
 
@@ -22,16 +33,22 @@
 
     <div class="row">
         <div class="col s12 m6 ">
+        <?php
+        $professionalExperiences = getAllProfessionalExperience($pdo);
+        foreach ($professionalExperiences as $professionalExperience)
+        {
+            ?>
             <div class="card grey darken-4">
                 <div class="card-content white-text">
-                    <span class="card-title">Card Title</span>
-                    <p>I am a very simple card. I am good at containing small bits of information.
-                        I am convenient because I require little markup to use effectively.</p>
+                    <span class="card-title"><?php echo $professionalExperience['company']?></span>
+                    <p><?php echo $professionalExperience['job']?></p>
+                    <p><?php echo $professionalExperience['description']?></p>
                 </div>
                 <div class="card-action">
                     <a href="#">This is a link</a>
                 </div>
             </div>
+            <?php } ?>
         </div>
     </div>
 

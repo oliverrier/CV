@@ -8,22 +8,18 @@
         $database_user = 'root';
         $database_password = 'root';
         $database_charset = 'UTF8';
-        $database_options = [
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        ];
         $pdo = new PDO(
             'mysql:host=' . $database_host .
             ';port=' . $database_port .
             ';dbname=' . $database_dbname .
             ';charset=' . $database_charset,
             $database_user,
-            $database_password,
-            $database_options
+            $database_password
         );
         return $pdo;
     }
 
+    /* Admin */
     function getAdmin ($pdo, $id)
 {
     $query = 'SELECT lastName, firstName, birthDate, drivingLicense, phoneNumber, address, mail, gitHubLink, linkedInLink, password FROM administrator WHERE id = :id';
@@ -31,6 +27,18 @@
     $query->execute(['id' => $id]);
     return $query->fetch();
 }
+
+function verifyAdmin ($pdo, $mail, $password)
+{
+    $query = 'SELECT id, mail FROM administrator WHERE mail = :mail AND password = :password';
+    $query = $pdo->prepare($query);
+    $query->execute([
+        'mail' => $mail,
+        'password' => $password,
+    ]);
+    return (bool) $query->fetch();
+}
+
 
 function getAllAdmin ($pdo)
 {
@@ -80,9 +88,14 @@ function deleteAdmin ($pdo, $user_id)
     $query->execute(['user_id' => $user_id]);
 }
 
+
+/* Professional Experience */
+
+
 function getProfessionalExperience ($pdo, $id)
 {
-    $query = 'SELECT startDate, endDate, company, job, description FROM professionnalexperience WHERE id = :id';
+    $query = 'SELECT startDate, endDate, company, job, description FROM professional_experience
+WHERE id = :id';
     $query = $pdo->prepare($query);
     $query->execute(['id' => $id]);
     return $query->fetch();
@@ -90,21 +103,35 @@ function getProfessionalExperience ($pdo, $id)
 
 function getAllProfessionalExperience  ($pdo)
 {
-    $query = 'SELECT startDate, endDate, company, job, description FROM professionnalexperience';
+    $query = 'SELECT id, startDate, endDate, company, job, description FROM professional_experience';
     $query = $pdo->prepare($query);
     $query->execute();
     return $query->fetchAll();
 }
 
+function addProfessionalExperience($pdo, $startDate, $endDate, $company, $job, $description)
+{
+    $query = 'INSERT INTO professional_experience(startDate, endDate, company, job, description) VALUES(:startDate, :endDate, :company, :job, :description)';
+    $query = $pdo->prepare($query);
+    $query->execute([
+        'startDate' => $startDate,
+        'endDate' => $endDate,
+        'company' => $company,
+        'job' => $job,
+        'description' => $description
+    ]);
+}
+
 function updateProfessionalExperience($pdo, $professionalExperienceId, $startDate, $endDate, $company, $job, $description)
 {
     $query = '
-                UPDATE professionnalexperience
+                UPDATE professional_experience
+            
                 SET startDate = :startDate, 
                     endDate = :endDate,
                     company = :company, 
                     job = :job, 
-                    description = :description, 
+                    description = :description
                 WHERE id = :professionalExperienceId
             ';
     $query = $pdo->prepare($query);
@@ -119,12 +146,16 @@ function updateProfessionalExperience($pdo, $professionalExperienceId, $startDat
 function deleteProfessionalExperience ($pdo, $professionalExperienceId)
 {
     $query = '
-                DELETE FROM professionalexperience
+                DELETE FROM professional_experience
                 WHERE id = :professionalExperienceId
             ';
     $query = $pdo->prepare($query);
     $query->execute(['professionalExperienceId' => $professionalExperienceId]);
 }
+
+
+/* Projects */
+
 
 function getProject ($pdo, $id)
 {
@@ -136,10 +167,24 @@ function getProject ($pdo, $id)
 
 function getAllProject  ($pdo)
 {
-    $query = 'SELECT startDate, endDate, name, description, isSchool FROM project';
+    $query = 'SELECT id, startDate, endDate, name, description, isSchool FROM project';
     $query = $pdo->prepare($query);
     $query->execute();
     return $query->fetchAll();
+}
+
+
+function addProject($pdo, $startDate, $endDate, $name, $description, $isSchool)
+{
+    $query = 'INSERT INTO project(startDate, endDate, name, description, isSchool) VALUES(:startDate, :endDate, :name, :description, :isSchool)';
+    $query = $pdo->prepare($query);
+    $query->execute([
+        'startDate' => $startDate,
+        'endDate' => $endDate,
+        'name' => $name,
+        'description' => $description,
+        'isSchool' => $isSchool
+    ]);
 }
 
 function updateProject($pdo, $projectId, $startDate, $endDate, $name, $description, $isSchool)
@@ -150,7 +195,7 @@ function updateProject($pdo, $projectId, $startDate, $endDate, $name, $descripti
                     endDate = :endDate,
                     name = :name, 
                     description = :description, 
-                    isSchool = :isSchool, 
+                    isSchool = :isSchool
                 WHERE id = :projectId
             ';
     $query = $pdo->prepare($query);
@@ -164,17 +209,20 @@ function updateProject($pdo, $projectId, $startDate, $endDate, $name, $descripti
 
 function deleteProject ($pdo, $projectId)
 {
-    $query = '
-                DELETE FROM project
-                WHERE id = :projectId
-            ';
+    $query = 'DELETE FROM project
+WHERE id = :projectId';
     $query = $pdo->prepare($query);
     $query->execute(['projectId' => $projectId]);
 }
 
+
+/* Project Type */
+
+
+
 function getProjectType ($pdo, $id)
 {
-    $query = 'SELECT name FROM projecttype WHERE id = :id';
+    $query = 'SELECT name FROM project_type WHERE id = :id';
     $query = $pdo->prepare($query);
     $query->execute(['id' => $id]);
     return $query->fetch();
@@ -182,18 +230,27 @@ function getProjectType ($pdo, $id)
 
 function getAllProjectType  ($pdo)
 {
-    $query = 'SELECT name FROM projecttype';
+    $query = 'SELECT id, name FROM project_type';
     $query = $pdo->prepare($query);
     $query->execute();
     return $query->fetchAll();
 }
 
+function addProjectType($pdo, $name)
+{
+    $query = 'INSERT INTO project_type(name) VALUES(:name)';
+    $query = $pdo->prepare($query);
+    $query->execute([
+        'name' => $name
+    ]);
+}
+
 function updateProjectType($pdo, $projectTypeId, $name)
 {
     $query = '
-                UPDATE project
-                SET name = :name,                     
-                WHERE id = :projectId
+                UPDATE project_type
+                SET name = :name                    
+                WHERE id = :projectTypeId
             ';
     $query = $pdo->prepare($query);
     $query->execute(['projectTypeId' => $projectTypeId,
@@ -203,16 +260,21 @@ function updateProjectType($pdo, $projectTypeId, $name)
 function deleteProjectType ($pdo, $projectTypeId)
 {
     $query = '
-                DELETE FROM project
+                DELETE FROM project_type
                 WHERE id = :projectTypeId
             ';
     $query = $pdo->prepare($query);
     $query->execute(['projectTypeId' => $projectTypeId]);
 }
 
+
+/* Study */
+
+
+
 function getStudy ($pdo, $id)
 {
-    $query = 'SELECT startDate, endDate, name, type, description FROM schoolexperience WHERE id = :id';
+    $query = 'SELECT startDate, endDate, name, type, description FROM study WHERE id = :id';
     $query = $pdo->prepare($query);
     $query->execute(['id' => $id]);
     return $query->fetch();
@@ -220,25 +282,40 @@ function getStudy ($pdo, $id)
 
 function getAllStudies  ($pdo)
 {
-    $query = 'SELECT startDate, endDate, name, type, description FROM schoolexperience';
+    $query = 'SELECT id ,startDate, endDate, name, type, description FROM study';
     $query = $pdo->prepare($query);
     $query->execute();
     return $query->fetchAll();
 }
 
-function updateStudy($pdo, $schoolExperienceId, $startDate, $endDate, $name, $type, $description)
+function addStudy($pdo, $startDate, $endDate, $name, $type, $description)
+{
+    $query = 'INSERT INTO study(startDate, endDate, name, type, description) VALUES(:startDate, :endDate, :name, :type, :description)';
+    $query = $pdo->prepare($query);
+    $query->execute([
+        'startDate' => $startDate,
+        'endDate' => $endDate,
+        'name' => $name,
+        'type' => $type,
+        'description' => $description
+    ]);
+}
+
+
+
+function updateStudy($pdo, $studyId, $startDate, $endDate, $name, $type, $description)
 {
     $query = '
-                UPDATE schoolexperience
+                UPDATE study
                 SET startDate = :startDate, 
                     endDate = :endDate,
                     name = :name, 
                     type = :type, 
-                    description = :description, 
-                WHERE id = :schoolExperienceId
+                    description = :description
+                WHERE id = :studyId
             ';
     $query = $pdo->prepare($query);
-    $query->execute(['schoolExperienceId' => $schoolExperienceId,
+    $query->execute(['studyId' => $studyId,
         'startDate' => $startDate,
         'endDate' => $endDate,
         'name' => $name,
@@ -246,19 +323,24 @@ function updateStudy($pdo, $schoolExperienceId, $startDate, $endDate, $name, $ty
         'description' => $description]);
 }
 
-function deleteStudy ($pdo, $schoolExperienceId)
+function deleteStudy ($pdo, $studyId)
 {
     $query = '
-                DELETE FROM schoolexperience
-                WHERE id = :schoolExperienceId
+                DELETE FROM study
+                WHERE id = :studyId
             ';
     $query = $pdo->prepare($query);
-    $query->execute(['schoolExperienceId' => $schoolExperienceId]);
+    $query->execute(['studyId' => $studyId]);
 }
+
+
+/* Skill */
+
+
 
 function getSkill ($pdo, $id)
 {
-    $query = 'SELECT name, level FROM skills WHERE id = :id';
+    $query = 'SELECT name, level FROM skill WHERE id = :id';
     $query = $pdo->prepare($query);
     $query->execute(['id' => $id]);
     return $query->fetch();
@@ -266,17 +348,29 @@ function getSkill ($pdo, $id)
 
 function getAllSkills  ($pdo)
 {
-    $query = 'SELECT name, level FROM skills';
+    $query = 'SELECT id, name, level FROM skill';
     $query = $pdo->prepare($query);
     $query->execute();
     return $query->fetchAll();
 }
 
+
+function addSkill($pdo, $name, $level)
+{
+    $query = 'INSERT INTO skill(name, level) VALUES(:name, :level)';
+    $query = $pdo->prepare($query);
+    $query->execute([
+        'name' => $name,
+        'level' => $level
+    ]);
+}
+
+
 function updateSkill($pdo, $skillId, $name, $level)
 {
-    $query = '  UPDATE skills
+    $query = '  UPDATE skill
                 SET name = :name,
-                    level = :level,                   
+                    level = :level                   
                 WHERE id = :skillId
             ';
     $query = $pdo->prepare($query);
@@ -288,10 +382,156 @@ function updateSkill($pdo, $skillId, $name, $level)
 function deleteSkill ($pdo, $skillId)
 {
     $query = '
-                DELETE FROM project
+                DELETE FROM skill
                 WHERE id = :skillId
             ';
     $query = $pdo->prepare($query);
     $query->execute(['skillId' => $skillId]);
+}
+
+
+/* Skill Type */
+
+
+function getSkillType ($pdo, $id)
+{
+    $query = 'SELECT id, name FROM skill_type WHERE id = :id';
+    $query = $pdo->prepare($query);
+    $query->execute(['id' => $id]);
+    return $query->fetch();
+}
+
+function getAllSkillTypes  ($pdo)
+{
+    $query = 'SELECT id, name FROM skill_type';
+    $query = $pdo->prepare($query);
+    $query->execute();
+    return $query->fetchAll();
+}
+
+function addSkillType ($pdo, $name)
+{
+    $query = 'INSERT INTO skill_type(name) VALUES(:name)';
+    $query = $pdo->prepare($query);
+    $query->execute([
+        'name' => $name
+    ]);
+}
+
+
+function updateSkillType($pdo, $skillTypeId, $name)
+{
+    $query = '  UPDATE skill_type
+                SET name = :name                  
+                WHERE id = :skillTypeId
+            ';
+    $query = $pdo->prepare($query);
+    $query->execute(['skillTypeId' => $skillTypeId,
+        'name' => $name]);
+}
+
+function deleteSkillType ($pdo, $skillTypeId)
+{
+    $query = '
+                DELETE FROM skill_type
+                WHERE id = :skillTypeId
+            ';
+    $query = $pdo->prepare($query);
+    $query->execute(['skillTypeId' => $skillTypeId]);
+}
+
+
+/* Hobby */
+
+function getHobby ($pdo, $id)
+{
+    $query = 'SELECT name FROM hobbies WHERE id = :id';
+    $query = $pdo->prepare($query);
+    $query->execute(['id' => $id]);
+    return $query->fetch();
+}
+
+function getAllHobbies  ($pdo)
+{
+    $query = 'SELECT id, name FROM hobbies';
+    $query = $pdo->prepare($query);
+    $query->execute();
+    return $query->fetchAll();
+}
+
+function addHobby ($pdo, $name)
+{
+    $query = 'INSERT INTO hobbies(name) VALUES(:name)';
+    $query = $pdo->prepare($query);
+    $query->execute([
+        'name' => $name
+    ]);
+}
+
+
+function updateHobbies($pdo, $hobbyId, $name)
+{
+    $query = '  UPDATE hobbies
+                SET name = :name                  
+                WHERE id = :hobbyId
+            ';
+    $query = $pdo->prepare($query);
+    $query->execute(['hobbyId' => $hobbyId,
+        'name' => $name]);
+}
+
+function deleteHobby ($pdo, $hobbyId)
+{
+    $query = '
+                DELETE FROM hobbies
+                WHERE id = :hobbyId
+            ';
+    $query = $pdo->prepare($query);
+    $query->execute(['hobbyId' => $hobbyId]);
+}
+
+/* Mail */
+
+
+function getMail ($pdo, $id)
+{
+    $query = 'SELECT email, content, firstName, lastName, sendDate, object FROM mail WHERE id = :id';
+    $query = $pdo->prepare($query);
+    $query->execute(['id' => $id]);
+    return $query->fetch();
+}
+
+function getAllMails ($pdo)
+{
+    $query = 'SELECT id, email, content, firstName, lastName, sendDate, object FROM mail';
+    $query = $pdo->prepare($query);
+    $query->execute();
+    return $query->fetchAll();
+}
+
+
+function addMail ($pdo, $email, $content, $firstName, $lastName, $sendDate, $object)
+{
+    $query = 'INSERT INTO mail(email, content, firstName, lastName, sendDate, object) VALUES(:email, :content, :firstName, :lastName, :sendDate, :object)';
+    $query = $pdo->prepare($query);
+    $query->execute([
+        'email' => $email,
+        'content' => $content,
+        'firstName' => $firstName,
+        'lastName' => $lastName,
+        'sendDate' => $sendDate,
+        'object' => $object
+    ]);
+}
+
+
+function deleteMail ($pdo, $mailId)
+{
+    $query = '
+                DELETE FROM mail
+                WHERE id = :mailId
+            ';
+    $query = $pdo->prepare($query);
+    $query->execute(['mailId' => $mailId]);
 }
 
